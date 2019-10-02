@@ -13,6 +13,10 @@ public class GDriveFile implements Serializable {
 	private String mimeType;
 	
 	private String folder;
+	
+	private String webViewLink;
+	
+	private Long fileSize;
 
 	public String getId() {
 		return id;
@@ -44,6 +48,22 @@ public class GDriveFile implements Serializable {
 
 	public void setFolder(String folder) {
 		this.folder = folder;
+	}
+
+	public String getWebViewLink() {
+		return webViewLink;
+	}
+
+	public void setWebViewLink(String webViewLink) {
+		this.webViewLink = webViewLink;
+	}
+
+	public Long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
 	}
 	
 }
