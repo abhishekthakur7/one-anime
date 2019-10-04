@@ -14,8 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.at.oanime.constant.ApplicationConstant;
 import com.at.oanime.model.GDriveFile;
 import com.at.oanime.model.ResponsePayload;
-import com.at.oanime.service.AuthorizationService;
-import com.at.oanime.service.DriveService;
 import com.at.oanime.util.ApplicationConfig;
 import com.at.oanime.util.StringUtils;
 import com.google.api.client.auth.oauth2.Credential;
@@ -25,14 +23,14 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
 @Service
-public class DriveServiceImpl implements DriveService {
+public class DriveServiceImpl {
 
 	private Logger logger = LoggerFactory.getLogger(DriveServiceImpl.class);
 
 	private Drive driveService;
 
 	@Autowired
-	AuthorizationService authorizationService;
+	AuthorizationServiceImpl authorizationService;
 
 	@Autowired
 	ApplicationConfig applicationConfig;
@@ -40,11 +38,10 @@ public class DriveServiceImpl implements DriveService {
 	@PostConstruct
 	public void init() throws Exception {
 		Credential credential = authorizationService.getCredentials();
-		driveService = new Drive.Builder(ApplicationConstant.HTTP_TRANSPORT, ApplicationConstant.JSON_FACTORY, credential)
-				.setApplicationName(ApplicationConstant.APPLICATION_NAME).build();
+		driveService = new Drive.Builder(ApplicationConstant.HTTP_TRANSPORT, ApplicationConstant.JSON_FACTORY,
+				credential).setApplicationName(ApplicationConstant.APPLICATION_NAME).build();
 	}
 
-	@Override
 	public void uploadFile(MultipartFile multipartFile) throws Exception {
 		logger.debug("Inside Upload Service...");
 
@@ -57,43 +54,43 @@ public class DriveServiceImpl implements DriveService {
 
 		File fileMetadata = new File();
 		fileMetadata.setName(fileName);
-		
+
 		FileContent mediaContent = new FileContent(contentType, transferedFile);
 		File file = driveService.files().create(fileMetadata, mediaContent).setFields("id").execute();
 
 		logger.debug("File name: {} and File Id: {}", file.getName(), file.getId());
 	}
 
-	@Override
 	public ResponsePayload getAllFiles(String mimeType) throws Exception {
 		FileList result = null;
-		
-		if(StringUtils.trimString(mimeType).equals("*")) {
+
+		if (StringUtils.trimString(mimeType).equals("*") || StringUtils.trimString(mimeType).isEmpty()) {
 			result = driveService.files().list().execute();
 		} else {
-			result = driveService.files().list().setQ("mimeType='"+mimeType+"'").execute();
+			result = driveService.files().list().setQ("mimeType='" + mimeType + "'")
+					.setFields("files(id,name,mimeType,fileExtension,webViewLink,webContentLink,thumbnailLink,videoMediaMetadata,teamDriveId,size)").execute();
 		}
-		
-	    List<File> files = result.getFiles();
-	    ResponsePayload payload = new ResponsePayload();
-	    List<GDriveFile> gDriveFiles = new ArrayList<>();
-	    
-	    for(File file : files) {
-	    	
-	    	logger.debug("File: {}", file.toString());
-	    	
-	    	GDriveFile gDriveFile = new GDriveFile();
-	    	gDriveFile.setId(file.getId());
-	    	gDriveFile.setName(file.getName());
-	    	gDriveFile.setMimeType(file.getMimeType());
-	    	gDriveFile.setWebViewLink(file.getWebViewLink());
-	    	gDriveFile.setFileSize(file.getQuotaBytesUsed());
-	    	gDriveFiles.add(gDriveFile);
-	    }
-	    
-	    payload.setFiles(gDriveFiles);
-	    
-	    return payload;
+
+		List<File> files = result.getFiles();
+		ResponsePayload payload = new ResponsePayload();
+		/**
+		 * List<GDriveFile> gDriveFiles = new ArrayList<>();
+		 * 
+		 * for(File file : files) {
+		 * 
+		 * logger.debug("File: {}", file.toString());
+		 * 
+		 * GDriveFile gDriveFile = new GDriveFile(); gDriveFile.setId(file.getId());
+		 * gDriveFile.setName(file.getName());
+		 * gDriveFile.setMimeType(file.getMimeType());
+		 * gDriveFile.setWebViewLink(file.getWebViewLink());
+		 * gDriveFile.setFileSize(file.getQuotaBytesUsed());
+		 * gDriveFile.setIconLink(file.getIconLink()); gDriveFiles.add(gDriveFile); }
+		 */
+
+		payload.setFiles(files);
+
+		return payload;
 	}
 
 }

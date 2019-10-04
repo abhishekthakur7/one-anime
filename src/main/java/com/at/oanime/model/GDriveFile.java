@@ -16,6 +16,8 @@ public class GDriveFile implements Serializable {
 	
 	private String webViewLink;
 	
+	private String iconLink;
+	
 	private Long fileSize;
 
 	public String getId() {
@@ -56,6 +58,14 @@ public class GDriveFile implements Serializable {
 
 	public void setWebViewLink(String webViewLink) {
 		this.webViewLink = webViewLink;
+	}
+	
+	public String getIconLink() {
+		return iconLink;
+	}
+
+	public void setIconLink(String iconLink) {
+		this.iconLink = iconLink;
 	}
 
 	public Long getFileSize() {

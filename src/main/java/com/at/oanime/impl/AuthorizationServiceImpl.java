@@ -17,11 +17,10 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.at.oanime.constant.ApplicationConstant;
-import com.at.oanime.service.AuthorizationService;
 import com.at.oanime.util.ApplicationConfig;
 
 @Service
-public class AuthorizationServiceImpl implements AuthorizationService {
+public class AuthorizationServiceImpl {
 
 	private Logger logger = LoggerFactory.getLogger(AuthorizationServiceImpl.class);
 	private GoogleAuthorizationCodeFlow flow;
@@ -40,7 +39,6 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 				ApplicationConstant.SCOPES).setDataStoreFactory(dataStoreFactory).build();
 	}
 
-	@Override
 	public boolean isUserAuthenticated() throws Exception {
 		Credential credential = getCredentials();
 		if (credential != null) {
@@ -51,27 +49,24 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 		return false;
 	}
 
-	@Override
 	public Credential getCredentials() throws IOException {
 		return flow.loadCredential(ApplicationConstant.USER_IDENTIFIER_KEY);
 	}
 
-	@Override
-	public String authenticateUserViaGoogle() throws Exception {
+	public String authenticateUserViaGoogle() {
 		GoogleAuthorizationCodeRequestUrl url = flow.newAuthorizationUrl();
 		String redirectUrl = url.setRedirectUri(config.getCallbackUri()).setAccessType("offline").build();
 		logger.debug("redirectUrl, {}", redirectUrl);
 		return redirectUrl;
 	}
 
-	@Override
 	public void exchangeCodeForTokens(String code) throws Exception {
 		// exchange the code against the access token and refresh token
 		GoogleTokenResponse tokenResponse = flow.newTokenRequest(code).setRedirectUri(config.getCallbackUri()).execute();
+		System.out.println("Access Token: " + tokenResponse.getAccessToken());
 		flow.createAndStoreCredential(tokenResponse, ApplicationConstant.USER_IDENTIFIER_KEY);
 	}
 
-	@Override
 	public void removeUserSession(HttpServletRequest request) throws Exception {
 //		HttpSession session = request.getSession(false);
 //        session = request.getSession(true);

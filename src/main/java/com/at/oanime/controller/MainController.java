@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.at.oanime.impl.AuthorizationServiceImpl;
+import com.at.oanime.impl.DriveServiceImpl;
 import com.at.oanime.model.ResponsePayload;
-import com.at.oanime.service.AuthorizationService;
-import com.at.oanime.service.DriveService;
 
 @RestController
 @CrossOrigin
@@ -24,10 +25,10 @@ public class MainController {
 	private Logger logger = LoggerFactory.getLogger(MainController.class);
 
 	@Autowired
-	AuthorizationService authorizationService;
+	AuthorizationServiceImpl authorizationService;
 
 	@Autowired
-	DriveService driveService;
+	DriveServiceImpl driveService;
 
 	/**
 	 * Handles the root request. Checks if user is already authenticated via SSO.

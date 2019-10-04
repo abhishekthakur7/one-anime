@@ -3,18 +3,19 @@ package com.at.oanime.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.api.services.drive.model.File;
 
 public class ResponsePayload implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<GDriveFile> files = new ArrayList<>();
+	private List<File> files = new ArrayList<>();
 
-	public List<GDriveFile> getFiles() {
+	public List<File> getFiles() {
 		return files;
 	}
 
-	public void setFiles(List<GDriveFile> files) {
+	public void setFiles(List<File> files) {
 		this.files = files;
 	}
 	
